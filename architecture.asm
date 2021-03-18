@@ -6,23 +6,23 @@
 	b => 4
 	c => 5
 	alu => 6
+	in => 7
 }
 
 #subruledef dest {
-	[mar] => 0
-	pc => 1
+	[mar] => 1
+	pc => 0
 	mar => 2
 	a => 3
 	b => 4
 	c => 5
 	alu => 6
-	seg => 7
+	out => 7
 }
 
 #ruledef
 {
-	out {port}, {s:source} 			=> 3`2 @ port`3 @ s`3
-	out {port}, {value:i8} 			=> 3`2 @ port`3 @ 1`3 @ value`8
+	seg {segment}, {address} 			=> 3`2 @ segment`6 @ address`8
 
 	mov {d:dest}, {s:source} 		=> 0`2 @ d`3 @ s`3
 	mov {d:dest}, {value:i8} 		=> {

@@ -1,104 +1,168 @@
 #include "architecture.asm"
 
-#addr 0x0000
-segment_0:
+#bankdef bank_0
+{
+    #addr 0x0000
+    #size 0x0100
+    #outp 0*8*0x100
+}
 
-
+; Set intial values
 mov a, 1
 mov mar, x
 mov [mar], a
 mov mar, y
 mov [mar], a
-out 0, 0x80
 
+; Calculate fibonacci sequence
 loop:
+	; Get next value in sequence
 	mov mar, x
 	mov a, [mar]
 	mov mar, y
 	mov b, [mar]
-	mov alu, 0b01001000
+	mov alu, 0b00010000 ; A add B
 	movc pc, exit
+	mov a, alu
 	mov mar, x
-	mov [mar], alu
-
-	mov a, ret_a
-	mov mar, return
 	mov [mar], a
-	mov mar, x
-	mov a, [mar]
-	mov pc, print
+	
+	; Print value
+	mov c, ret_a
+	mov mar, print_val-1
+	mov [mar], c
+	mov pc, print_val
 	ret_a:
 	
+	; Get next value in sequence
 	mov mar, x
 	mov a, [mar]
 	mov mar, y
 	mov b, [mar]
-	mov alu, 0b01001000
+	mov alu, 0b00010000 ; A add B
 	movc pc, exit
+	mov a, alu
 	mov mar, y
-	mov [mar], alu
-	
-	mov a, ret_b
-	mov mar, return
 	mov [mar], a
-	mov mar, y
-	mov a, [mar]
-	mov pc, print
+	
+	; Print value
+	mov c, ret_b
+	mov mar, print_val-1
+	mov [mar], c
+	mov pc, print_val
 	ret_b:
-
 	
 	mov pc, loop
 
-print:
-	mov mar, .temp			; Backup value
-	mov [mar], a
 
-	.loop10:
-	mov b, 10
-	mov alu, 0b01001001
-	movc pc, .skip10		; If A less than 10
-	mov a, alu				; Otherwise sub 10
-	mov pc, .loop10
-	.skip10:
-	mov b, "0"
-	mov alu, 0b01001000
-	out 0, alu
+; A / B
+; Result in C
+; Remainder in A
+#d8 0
+divide:
+	mov c, 0
+	.loop:
+	mov alu, 0b00010001 ; A sub B
+	movc pc, .skip
+	mov a, alu
+	mov alu, 0b01111000	; Inc C
+	mov c, alu
+	mov pc, .loop
+	.skip:
 
-	mov a, [mar]
-	.loopdiv:
-	mov b, 10
-	mov alu, 0b01001001
-	movc pc, .skipdiv
-	.skipdiv:
-
-	out 0, "\n"
-	mov mar, return
+	; Return
+	mov mar, divide-1
 	mov pc, [mar]
-	
-	.temp:
-	#d8 0
+
+#d8 0
+print_val:
+	; Divide by 100
+	mov b, 100
+	mov c, .ret_a
+	mov mar, divide-1
+	mov [mar], c
+	mov pc, divide
+	.ret_a:
+	mov b, "0"
+	mov alu, 0b00011000 ; C add B
+	mov out, alu
+
+	; Divide by 10
+	mov b, 10
+	mov c, .ret_b
+	mov mar, divide-1
+	mov [mar], c
+	mov pc, divide
+	.ret_b:
+	mov b, "0"
+	mov alu, 0b00011000 ; C add B
+	mov out, alu
+	mov alu, 0b00010000 ; A add B
+	mov out, alu
+
+	mov out, "\n"
+
+	; Return
+	mov mar, print_val-1
+	mov pc, [mar]
 
 exit:
-	mov a, 1
-	mov seg, a
+	seg 1, end
 
 x:
 #d8 1
 y:
 #d8 1
 
-return:
-#d8 0
+#bankdef bank_1
+{
+    #addr 0x0000
+    #size 0x0100
+    #outp 1*8*0x100
+}
 
-#addr 0x0100
-segment_1:
 
 end:
-	out 0, "\n"
-	out 0, "D"
-	out 0, "o"
-	out 0, "n"
-	out 0, "e"
-	out 0, "!"
-stop:
-	mov pc, stop-segment_1
+	mov a, end_str
+	mov c, .loop
+	mov mar, print_str-1
+	mov [mar], c
+	mov pc, print_str
+
+; Echo terminal input back
+.loop:
+	; Check for new data
+	mov a, in
+	mov b, 0b10000000
+	mov alu, 0b00010010	; A NAND B
+	mov a, alu
+	mov alu, 0b00000010	; NOT A
+	movz pc, .skip
+
+	; Output and advance input buffer
+	mov out, in
+	mov out, 0x80
+.skip:
+	mov pc, .loop
+
+; Print string at address stored in A
+#d8 0
+print_str:
+	mov mar, a
+	
+	.loop:
+	mov a, [mar]
+	mov alu, 0b00110000 ; No operation, just set flags
+	movz pc, .skip
+	mov out, a
+	mov alu, 0b01111100 ; Inc MAR
+	mov mar, alu
+	mov pc, .loop
+	.skip:
+
+	; Return
+	mov mar, print_str-1
+	mov pc, [mar]
+
+end_str:
+#d "Done!\0"
