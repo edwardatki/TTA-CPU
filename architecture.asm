@@ -22,7 +22,8 @@
 
 #ruledef
 {
-	seg {segment}, {address} 			=> 3`2 @ segment`6 @ address`8
+	segc {segment}, {address} 		=> 3`2 @ 0`1 @ segment`5 @ address`8
+	segd {segment}					=> 3`2 @ 1`1 @ segment ` 5
 
 	mov {d:dest}, {s:source} 		=> 0`2 @ d`3 @ s`3
 	mov {d:dest}, {value:i8} 		=> {

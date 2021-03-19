@@ -107,7 +107,7 @@ print_val:
 	mov pc, [mar]
 
 exit:
-	seg 1, end
+	segc 1, end
 
 x:
 #d8 1
@@ -121,12 +121,21 @@ y:
     #outp 1*8*0x100
 }
 
-
 end:
+	segd 1
+
 	mov a, end_str
+	mov c, .ret
+	mov mar, print_str-1
+	mov [mar], c
+	mov pc, print_str
+	.ret:
+
+	mov a, far_str
 	mov c, .loop
 	mov mar, print_str-1
 	mov [mar], c
+	segd 2
 	mov pc, print_str
 
 ; Echo terminal input back
@@ -160,9 +169,22 @@ print_str:
 	mov pc, .loop
 	.skip:
 
+	segd 1
+	mov out, "\n"
+
 	; Return
 	mov mar, print_str-1
 	mov pc, [mar]
 
 end_str:
 #d "Done!\0"
+
+#bankdef bank_2
+{
+    #addr 0x0000
+    #size 0x0100
+    #outp 2*8*0x100
+}
+
+far_str:
+#d "This data is from a different segment", 0x00

@@ -74,41 +74,54 @@
   65:0 |   65 | 11 43 ; mov mar, print_val-1
   67:0 |   67 | 02    ; mov pc, [mar]
   68:0 |   68 |       ; exit:
-  68:0 |   68 | c1 00 ; seg 1, end
+  68:0 |   68 | c1 00 ; segc 1, end
   6a:0 |   6a |       ; x:
   6a:0 |   6a | 01    ; #d8 1
   6b:0 |   6b |       ; y:
   6b:0 |   6b | 01    ; #d8 1
  100:0 |    0 |       ; end:
- 100:0 |    0 | 19 28 ; mov a, end_str
- 102:0 |    2 | 29 09 ; mov c, .loop
- 104:0 |    4 | 11 18 ; mov mar, print_str-1
- 106:0 |    6 | 0d    ; mov [mar], c
- 107:0 |    7 | 01 19 ; mov pc, print_str
- 109:0 |    9 |       ; .loop:
- 109:0 |    9 | 1f    ; mov a, in
- 10a:0 |    a | 21 80 ; mov b, 0b10000000
- 10c:0 |    c | 31 12 ; mov alu, 0b00010010
- 10e:0 |    e | 1e    ; mov a, alu
- 10f:0 |    f | 31 02 ; mov alu, 0b00000010
- 111:0 |   11 | 41 16 ; movz pc, .skip
- 113:0 |   13 | 3f    ; mov out, in
- 114:0 |   14 | 39 80 ; mov out, 0x80
- 116:0 |   16 |       ; .skip:
- 116:0 |   16 | 01 09 ; mov pc, .loop
- 118:0 |   18 | 00    ; #d8 0
- 119:0 |   19 |       ; print_str:
- 119:0 |   19 | 13    ; mov mar, a
- 11a:0 |   1a |       ; .loop:
- 11a:0 |   1a | 1a    ; mov a, [mar]
- 11b:0 |   1b | 31 30 ; mov alu, 0b00110000
- 11d:0 |   1d | 41 25 ; movz pc, .skip
- 11f:0 |   1f | 3b    ; mov out, a
- 120:0 |   20 | 31 7c ; mov alu, 0b01111100
- 122:0 |   22 | 16    ; mov mar, alu
- 123:0 |   23 | 01 1a ; mov pc, .loop
- 125:0 |   25 |       ; .skip:
- 125:0 |   25 | 11 18 ; mov mar, print_str-1
- 127:0 |   27 | 02    ; mov pc, [mar]
- 128:0 |   28 |       ; end_str:
- 128:0 |   28 | 44 6f 6e 65 21 00 ; #d "Done!\0"
+ 100:0 |    0 | e1    ; segd 1
+ 101:0 |    1 | 19 35 ; mov a, end_str
+ 103:0 |    3 | 29 0a ; mov c, .ret
+ 105:0 |    5 | 11 22 ; mov mar, print_str-1
+ 107:0 |    7 | 0d    ; mov [mar], c
+ 108:0 |    8 | 01 23 ; mov pc, print_str
+ 10a:0 |    a |       ; .ret:
+ 10a:0 |    a | 18    ; mov a, far_str
+ 10b:0 |    b | 29 13 ; mov c, .loop
+ 10d:0 |    d | 11 22 ; mov mar, print_str-1
+ 10f:0 |    f | 0d    ; mov [mar], c
+ 110:0 |   10 | e2    ; segd 2
+ 111:0 |   11 | 01 23 ; mov pc, print_str
+ 113:0 |   13 |       ; .loop:
+ 113:0 |   13 | 1f    ; mov a, in
+ 114:0 |   14 | 21 80 ; mov b, 0b10000000
+ 116:0 |   16 | 31 12 ; mov alu, 0b00010010
+ 118:0 |   18 | 1e    ; mov a, alu
+ 119:0 |   19 | 31 02 ; mov alu, 0b00000010
+ 11b:0 |   1b | 41 20 ; movz pc, .skip
+ 11d:0 |   1d | 3f    ; mov out, in
+ 11e:0 |   1e | 39 80 ; mov out, 0x80
+ 120:0 |   20 |       ; .skip:
+ 120:0 |   20 | 01 13 ; mov pc, .loop
+ 122:0 |   22 | 00    ; #d8 0
+ 123:0 |   23 |       ; print_str:
+ 123:0 |   23 | 13    ; mov mar, a
+ 124:0 |   24 |       ; .loop:
+ 124:0 |   24 | 1a    ; mov a, [mar]
+ 125:0 |   25 | 31 30 ; mov alu, 0b00110000
+ 127:0 |   27 | 41 2f ; movz pc, .skip
+ 129:0 |   29 | 3b    ; mov out, a
+ 12a:0 |   2a | 31 7c ; mov alu, 0b01111100
+ 12c:0 |   2c | 16    ; mov mar, alu
+ 12d:0 |   2d | 01 24 ; mov pc, .loop
+ 12f:0 |   2f |       ; .skip:
+ 12f:0 |   2f | e1    ; segd 1
+ 130:0 |   30 | 39 0a ; mov out, "\n"
+ 132:0 |   32 | 11 22 ; mov mar, print_str-1
+ 134:0 |   34 | 02    ; mov pc, [mar]
+ 135:0 |   35 |       ; end_str:
+ 135:0 |   35 | 44 6f 6e 65 21 00 ; #d "Done!\0"
+ 200:0 |    0 |       ; far_str:
+ 200:0 |    0 | 54 68 69 73 20 64 61 74 61 20 69 73 20 66 72 6f 6d 20 61 20 64 69 66 66 65 72 65 6e 74 20 73 65 67 6d 65 6e 74 ; #d "This data is from a different segment"
+ 225:0 |   25 | 00    ; 0x00
