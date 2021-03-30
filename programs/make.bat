@@ -1,4 +1,4 @@
 @echo off
 
-customasm fibonacci.asm -f logisim8 -o fibonacci.lbi
-customasm fibonacci.asm -f annotated -o fibonacci.txt
+customasm main.asm -f logisim8 -o main.lbi
+customasm main.asm -f annotated -o main.txt
